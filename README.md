@@ -32,12 +32,12 @@ Companion to the [Touhou 6 Switch port](https://github.com/Swiizyu/th06-switch),
 ### 1. SD Card File Structure
 
 1. Ensure your Nintendo Switch is running custom firmware (Atmosphère CFW).
-2. Download the latest `th07.nro` from the [Releases](../../releases) tab (or build from source).
+2. Download the latest `touhou07.nro` from the [Releases](../../releases) tab (or build from source).
 3. Create a folder named `sd:/switch/th07/` and copy the following into it:
 
 ```text
 sd:/switch/th07/
-    ├── th07.nro          # Nintendo Switch homebrew executable
+    ├── touhou07.nro          # Nintendo Switch homebrew executable
     ├── th07.dat          # Main game archive
     ├── thbgm.dat         # Background music archive
     └── msgothic.ttc      # Japanese font (ships with the Windows release)
@@ -51,7 +51,7 @@ Unlike Touhou 6, no extra soundtrack download is needed: PCB ships its BGM insid
 
 ### 3. Launching
 
-Run `th07.nro` from the **Homebrew Menu (hbmenu)**, **Sphaira launcher**, or a home screen forwarder.
+Run `touhou07.nro` from the **Homebrew Menu (hbmenu)**, **Sphaira launcher**, or a home screen forwarder.
 
 ---
 
@@ -97,7 +97,7 @@ This repository includes a CI pipeline (`.github/workflows/build-switch.yml`). P
    ./scripts/build_switch.sh game     # rebuild the game only
    ```
 
-   The result is `th07.nro` in the repository root.
+   The result is `touhou07.nro` in the repository root.
 
 The script cross-compiles an SDL3 stack into `ext/prefix` first, because devkitPro only ships SDL2 for Switch and the official SDL3 Switch port is NDA-gated:
 
