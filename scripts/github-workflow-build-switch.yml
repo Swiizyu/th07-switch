@@ -1,0 +1,55 @@
+name: Build Switch NRO
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: devkitpro/devkita64:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install host build tools
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq cmake ninja-build git python3
+
+      # The SDL3 stack takes the bulk of the build time and only changes when
+      # the patches or pinned tags do, so keep it between runs.
+      - name: Cache SDL3 stack
+        uses: actions/cache@v4
+        with:
+          path: ext
+          key: sdl3-switch-${{ runner.os }}-${{ hashFiles('platform/switch/sdl3-switch.patch', 'platform/switch/sdl3-switch-gles3.patch', 'scripts/build_switch.sh') }}
+
+      - name: Build
+        env:
+          DEVKITPRO: /opt/devkitpro
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chmod +x scripts/build_switch.sh
+          ./scripts/build_switch.sh
+
+      - name: Show result
+        run: ls -lh th07.nro
+
+      - name: Upload NRO
+        uses: actions/upload-artifact@v4
+        with:
+          name: th07-switch
+          path: th07.nro
+          if-no-files-found: error
+
+      # Tagged pushes additionally publish the NRO as a release asset.
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: th07.nro

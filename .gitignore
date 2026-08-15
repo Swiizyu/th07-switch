@@ -1,0 +1,30 @@
+# --- upstream ---
+# too lazy to get my ghidra project out of there
+*.gpr
+*.lock
+*.rep
+.venv*
+assets
+build
+thirdparty/*
+resources/custom.exe
+resources/th07.exe
+reccmp-user.yml
+reccmp-build.yml
+
+# --- switch port ---
+# cross-compiled SDL3 stack + its sources, fetched by scripts/build_switch.sh
+ext/
+# cmake build tree
+build-switch/
+# build products
+*.nro
+*.nacp
+*.elf
+
+# game data must never be committed
+th07.dat
+thbgm.dat
+msgothic.ttc
+th07.cfg
+score.dat

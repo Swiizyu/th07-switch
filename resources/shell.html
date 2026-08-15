@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+    <head>
+        <title>東方妖々夢　〜 Perfect Cherry Blossom</title>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <style>
+            #progress {
+                height: 20px;
+                width: 300px;
+                padding-left: 0;
+                padding-right: 0;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+                padding: 0;
+                margin: auto;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+
+            .canvas {
+                padding-left: 0;
+                padding-right: 0;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+                padding: 0;
+                margin: auto;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                object-fit: contain;
+                width: 100vw;
+                height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <progress value="0" max="100" id="progress"></progress>
+
+        <canvas
+            id="canvas"
+            class="canvas"
+            oncontextmenu="event.preventDefault()"
+        ></canvas>
+        <script>
+            var progressElement = document.getElementById("progress");
+            var Module = {
+                preRun: [],
+                canvas: (() => {
+                    var canvas = document.getElementById("canvas");
+
+                    canvas.addEventListener(
+                        "webglcontextlost",
+                        (e) => {
+                            alert(
+                                "WebGL context lost. You will need to reload the page.",
+                            );
+                            e.preventDefault();
+                        },
+                        false,
+                    );
+
+                    return canvas;
+                })(),
+                setStatus: (text) => {
+                    if (!Module.setStatus.last)
+                        Module.setStatus.last = { time: Date.now(), text: "" };
+                    if (text === Module.setStatus.last.text) return;
+                    var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+                    var now = Date.now();
+                    if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+                    Module.setStatus.last.time = now;
+                    Module.setStatus.last.text = text;
+                    if (m) {
+                        text = m[1];
+                        progressElement.value = parseInt(m[2]) * 100;
+                        progressElement.max = parseInt(m[4]) * 100;
+                        progressElement.hidden = false;
+                    } else {
+                        progressElement.value = null;
+                        progressElement.max = null;
+                        progressElement.hidden = true;
+                    }
+                },
+                onRuntimeInitialized: () => {
+                    try {
+                        FS.mkdir("/savesth07");
+                    } catch (e) {
+                        console.error(e);
+                    }
+
+                    FS.mount(IDBFS, { autoPersist: true }, "/savesth07");
+                    FS.syncfs(true, function (e) {
+                        if (e) {
+                            console.error(e);
+                            return;
+                        }
+                        console.log("idbfs initialized successfully");
+                        if (Module.callMain) Module.callMain();
+                    });
+                },
+            };
+            window.addEventListener("beforeunload", (event) => {
+                event.preventDefault();
+                event.returnValue = true;
+            });
+        </script>
+
+        {{{ SCRIPT }}}
+    </body>
+</html>
